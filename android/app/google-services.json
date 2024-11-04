@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "883544756033",
+    "project_id": "stadtplan-app",
+    "storage_bucket": "stadtplan-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:883544756033:android:b00bbfd6e705c32df95bc0",
+        "android_client_info": {
+          "package_name": "ch.stadtplan.zurich"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDAFoECHTc9r3Du7Vsio8EUcNMDqBwCpMk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

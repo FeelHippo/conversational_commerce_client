@@ -79,3 +79,37 @@ git push # or whatever branch you're on
 It is reccomended to use [Simple Flutter Version Manager](https://fvm.app/) when running this project.
 When you first run this project, you should first execute `fvm use <FLUTTER_SDK_VERSION>`
 This project is being developed on 3.24.4 for the time being.
+
+<!-- FIREBASE -->
+### Firebase SDK
+Firebase configuration file lib/firebase_options.dart is generated as follows:
+[Documentation](https://firebase.google.com/docs/flutter/setup?platform=ios)
+- automate firebase_options.dart fetch in CI:
+    - dart pub global activate flutterfire_cli
+    - export PATH="$PATH":"$HOME/.pub-cache/bin"
+    - url -sL https://firebase.tools | bash
+    - firebase login
+    - flutterfire configure
+- to see all available apps for a project: `firebase apps:list --project stadtplan-app`
+- to get `google-services.json` via the CLI: `firebase apps:sdkconfig --project stadtplan-app`
+    - select `stadtplan-app (android) - ... (ANDROID)`
+    - this will create a new `./android/app/google-services.json`
+- iOs:
+    - download the `GoogleService-Info.plist` file from Firebase
+    - drag and drop the file directly into xCode (it will not work if dropped into Android Studio or VS Code)
+
+To sync the project dependencies:
+- make sure your local JDK is at least 17: `java -version`, else [set it up](https://docs.oracle.com/cd/E19182-01/820-7851/inst_cli_jdk_javahome_t/)
+- set up Gradle in Android Studio:
+    - `where gradle` will show you the path to gradle, e.g. `/opt/homebrew/bin/gradle`
+    - copy `/opt/homebrew/bin`
+    - go to Android Studio => Settings => Build, Execution, Deployment => Gradle => General Settings
+    - replace whatever path you see in "Gradle user home" with the above
+    - File => New => Import Project => import project's Android folder
+    - File => [Sync Project](https://developer.android.com/build#sync-files)
+    - in case of conflicts between Gradle dependencies, make sure the [dependencies](https://github.com/Springworks/as-charging-app/blob/main/android/build.gradle) have compatible versions
+- build xCode project:
+    - from the root of the charging app folder: `cd ios | pod install | cd ..`
+    - from the terminal, run `flutter build ios --flavor <FLAVOR_NAME_HERE>` to make sure everything is fine
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
