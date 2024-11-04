@@ -13,7 +13,6 @@
         <li><a href="#setup">Setup</a></li>
         <li><a href="#flutter-sdk-version">Flutter SDK Version</a></li>
         <li><a href="#firebase-sdk">Firebase SDK</a></li>
-        <li><a href="#fastlane-integration">Fastlane integration</a></li>
         <li><a href="#google-maps-api">Google Maps API</a></li>
       </ul>
     </li>
@@ -111,5 +110,13 @@ To sync the project dependencies:
 - build xCode project:
     - from the root of the charging app folder: `cd ios | pod install | cd ..`
     - from the terminal, run `flutter build ios --flavor <FLAVOR_NAME_HERE>` to make sure everything is fine
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- GOOGLE MAPS API -->
+### Google Maps API
+[Here](https://developers.google.com/maps/flutter-package/config) you will find documentation.
+[Google API Key](https://console.cloud.google.com/apis/credentials/key/62c6396e-3985-4aad-9dd4-c9a92151f1c6?project=model-arcadia-440721-k3) is encrypted in AppDelegate.swift and AndroidManifest.xml for iOs and Android respectively.
+Download `google-services.json` and `GoogleService-Info.plist` files again, build xCode project, Sync Android project
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
