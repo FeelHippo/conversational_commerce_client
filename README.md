@@ -73,3 +73,9 @@ git push # or whatever branch you're on
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- FLUTTER SDK VERSION -->
+### Flutter SDK Version
+It is reccomended to use [Simple Flutter Version Manager](https://fvm.app/) when running this project.
+When you first run this project, you should first execute `fvm use <FLUTTER_SDK_VERSION>`
+This project is being developed on 3.24.4 for the time being.
