@@ -1,4 +1,4 @@
-package com.example.stadtplan_mobile_app
+package ch.stadtplan.zurich
 
 import io.flutter.embedding.android.FlutterActivity
 
