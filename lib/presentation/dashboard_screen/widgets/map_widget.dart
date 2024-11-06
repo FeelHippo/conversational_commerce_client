@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:ui' as ui show Image;
 import 'dart:ui';
 
+import 'package:apiClient/main.dart';
 import 'package:fimber/fimber.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -13,18 +14,17 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as location;
 import 'package:stadtplan/constants/list_constants.dart';
-import 'package:apiClient/main.dart';
-import 'package:storage/main.dart';
 import 'package:stadtplan/presentation/common/map_utils.dart';
-import 'package:stadtplan/presentation/dashboard_screen/pois_bloc/pois_bloc.dart';
 import 'package:stadtplan/presentation/dashboard_screen/models/pois_view_model.dart';
+import 'package:stadtplan/presentation/dashboard_screen/pois_bloc/pois_bloc.dart';
+import 'package:stadtplan/presentation/dashboard_screen/position_bloc/position_bloc.dart';
 import 'package:stadtplan/presentation/dashboard_screen/utils/marker_utils.dart';
 import 'package:stadtplan/presentation/dashboard_screen/widgets/center_change_notifier.dart';
 import 'package:stadtplan/presentation/navigation/app_navigator.dart';
 import 'package:stadtplan/presentation/navigation/app_routes.dart';
 import 'package:stadtplan/presentation/widgets/app_scaffold.dart';
-import 'package:stadtplan/presentation/widgets/circular_progress_bar.dart';
 import 'package:stadtplan/utils/snackbar_mixin.dart';
+import 'package:storage/main.dart';
 
 /// Class MapWidget
 ///
@@ -54,10 +54,16 @@ class MapWidgetState extends State<MapWidget>
         AutomaticKeepAliveClientMixin<MapWidget>,
         WidgetsBindingObserver,
         SnackBarMixin {
-  static const ValueKey<String> locationPermissionSnackBarKey = ValueKey<String>('MapWidgetState.LocationPermissionSnackBarKey');
+  static const ValueKey<String> locationPermissionSnackBarKey =
+      ValueKey<String>('MapWidgetState.LocationPermissionSnackBarKey');
   final GlobalKey _mapGlobalKey = GlobalKey();
-  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
 
+  late PositionBloc _positionBloc;
+  late POIsBloc _poisBloc;
+
+  late LatLng currentUserPosition;
   late List<POIViewModel> pois;
 
   /// User Icon
@@ -67,9 +73,6 @@ class MapWidgetState extends State<MapWidget>
 
   /// User Location Stream
   StreamSubscription<Position>? _userPositionStream;
-
-  /// Current Position
-  LatLng? _currentUserPosition;
 
   /// Previous Position
   LatLng? _lastFetchedPosition;
@@ -81,7 +84,8 @@ class MapWidgetState extends State<MapWidget>
   Set<Marker> mapSetMarkers = <Marker>{};
 
   /// Marker Image Map
-  Map<String, BitmapDescriptor?> mapImageMarkers = <String, BitmapDescriptor?>{};
+  Map<String, BitmapDescriptor?> mapImageMarkers =
+      <String, BitmapDescriptor?>{};
 
   /// mapStyle
   String? mapStyle;
@@ -104,14 +108,14 @@ class MapWidgetState extends State<MapWidget>
   @override
   bool get wantKeepAlive => true;
 
-  late POIsBloc _poisBloc;
-
   @override
   void initState() {
     super.initState();
     widget.centerChangeNotifier.addListener(moveCameraToCurrentLocation);
     WidgetsBinding.instance.addObserver(this);
     pois = <POIViewModel>[];
+    _positionBloc = BlocProvider.of<PositionBloc>(context)
+      ..add(StartTrackingPositionEvent());
     _poisBloc = BlocProvider.of<POIsBloc>(context);
     initData();
   }
@@ -135,8 +139,8 @@ class MapWidgetState extends State<MapWidget>
 
   Future<void> doResumeAppLifecycle() async {
     await mapController?.setMapStyle(mapStyle);
-    //Check if GPS enabled after confirmation from GPS dialog
-    if (await location.Location().serviceEnabled() && centerClicked) {
+    // Check if GPS enabled after confirmation from GPS dialog
+    if (centerClicked) {
       centerClicked = false;
       await moveMarkerToCurrentLocation();
     }
@@ -149,25 +153,14 @@ class MapWidgetState extends State<MapWidget>
     _lastFetchedPosition = currentCenter;
   }
 
-  Future<void> setCurrentPosition() async {
-    final Position? position = await Geolocator.getLastKnownPosition(
-      forceAndroidLocationManager: true,
-    );
-    if (position != null) {
-      _currentUserPosition = LatLng(position.latitude, position.longitude);
-    }
-  }
-
   Future<void> moveMarkerToCurrentLocation() async {
-    await setCurrentPosition();
     widget.centerChangeNotifier.centerMe();
   }
 
   Future<void> moveCameraToCurrentLocation() async {
-    if (_currentUserPosition != null &&
-        widget.centerChangeNotifier.isCenterMe) {
+    if (widget.centerChangeNotifier.isCenterMe) {
       // move user marker to current location
-      await _moveCamera(_currentUserPosition!);
+      await _moveCamera(currentUserPosition);
     }
   }
 
@@ -177,7 +170,8 @@ class MapWidgetState extends State<MapWidget>
       // Listener for user current location icon
       widget.centerChangeNotifier.addListener(() async {
         if (widget.centerChangeNotifier.isCenterMe) {
-          final LocationPermission geolocationStatus = await Geolocator.checkPermission();
+          final LocationPermission geolocationStatus =
+              await Geolocator.checkPermission();
           // if permission denied forever then open location permission BottomSheet
           if (geolocationStatus == LocationPermission.deniedForever ||
               geolocationStatus == LocationPermission.denied) {
@@ -222,23 +216,23 @@ class MapWidgetState extends State<MapWidget>
   Future<void> loadMapData() async {
     try {
       final ImageConfiguration imageConfiguration =
-      createLocalImageConfiguration(context);
+          createLocalImageConfiguration(context);
 
       if (_mapMeIcon == null) {
         final AssetBundleImageKey resolvedMarkerImage =
-        await const AssetImage('assets/common/user_map_pin.png')
-            .obtainKey(imageConfiguration);
+            await const AssetImage('assets/common/user_map_pin.png')
+                .obtainKey(imageConfiguration);
         final Uint8List markerIcon =
-        await MapUtils.getBytesFromAsset(resolvedMarkerImage.name);
+            await MapUtils.getBytesFromAsset(resolvedMarkerImage.name);
         _mapMeIcon = BitmapDescriptor.fromBytes(markerIcon);
       }
 
       if (_mapSearchResultIcon == null) {
         final AssetBundleImageKey resolvedMarkerImage =
-        await const AssetImage('assets/common/poi.png')
-            .obtainKey(imageConfiguration);
+            await const AssetImage('assets/common/poi.png')
+                .obtainKey(imageConfiguration);
         final Uint8List markerIcon =
-        await MapUtils.getBytesFromAsset(resolvedMarkerImage.name);
+            await MapUtils.getBytesFromAsset(resolvedMarkerImage.name);
         _mapSearchResultIcon = BitmapDescriptor.fromBytes(markerIcon);
       }
     } catch (e) {
@@ -306,15 +300,21 @@ class MapWidgetState extends State<MapWidget>
         final bool addressModelHasChanged =
             previous.addressModel != current.addressModel;
         final bool poiListsAreNotEqual =
-        !listEquals(previous.pois, current.pois);
+            !listEquals(previous.pois, current.pois);
         return addressModelHasChanged || poiListsAreNotEqual;
       },
       builder: (BuildContext context, POIsState state) {
-        return FutureBuilder<bool>(
-          future: _isMapStyleInit(),
-          builder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
-            return _buildGoogleMaps(snapshot.data ?? isBlocLoading);
+        return BlocListener<PositionBloc, PositionState>(
+          listener: (BuildContext context, PositionState state) {
+            currentUserPosition = state.currentPosition;
+            isBlocLoading = state.loading;
           },
+          child: FutureBuilder<bool>(
+            future: _isMapStyleInit(),
+            builder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
+              return _buildGoogleMaps(snapshot.data ?? isBlocLoading);
+            },
+          ),
         );
       },
     );
@@ -329,32 +329,28 @@ class MapWidgetState extends State<MapWidget>
   }
 
   Future<bool> _isMapStyleInit() async {
-    _currentUserPosition = await widget.positionInteractor.getUserPosition();
     // render map style
     mapStyle ??=
-      await rootBundle.loadString('assets/common/files/map_style.json');
+        await rootBundle.loadString('assets/common/files/map_style.json');
     // display the map
     return true;
   }
 
   /// Build Google Maps with marker & style
   Widget _buildGoogleMaps(bool isReady) {
-    return Visibility(
-      visible: isReady,
-      replacement: const Center(child: CircularProgressIndicator()),
-      child: Stack(
-        children: <Widget>[
-          GoogleMap(
+    print('||| _buildGoogleMaps ${isReady}');
+    return isReady
+        ? GoogleMap(
             key: _mapGlobalKey,
             zoomControlsEnabled: false,
             minMaxZoomPreference: const MinMaxZoomPreference(8.8, 20),
             onCameraIdle: () async {
               if (mapController !=
-                  null && // GoogleMaps controller is initialized
-                  isCameraMoving && // user has been actively changing location
-                  _lastFetchedPosition !=
-                      null // map has already been populated with POIs
-              ) {
+                          null && // GoogleMaps controller is initialized
+                      isCameraMoving && // user has been actively changing location
+                      _lastFetchedPosition !=
+                          null // map has already been populated with POIs
+                  ) {
                 await doRefreshAllPois();
                 isCameraMoving = false;
                 hasZoomed = false;
@@ -364,14 +360,14 @@ class MapWidgetState extends State<MapWidget>
             onCameraMove: onCameraMove,
             gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{}
               ..add(Factory<OneSequenceGestureRecognizer>(
-                      () => EagerGestureRecognizer()))
+                  () => EagerGestureRecognizer()))
               ..add(Factory<PanGestureRecognizer>(() => PanRecognizer(() {
-                widget.centerChangeNotifier.clearCenter();
-              }))),
+                    widget.centerChangeNotifier.clearCenter();
+                  }))),
             myLocationButtonEnabled: false,
             markers: getMarkers(),
             initialCameraPosition: _getCameraPosition(
-              _currentUserPosition ?? widget.initialUserPosition,
+              currentUserPosition,
               zoom: zoomLevel,
             ),
             mapToolbarEnabled: false,
@@ -383,17 +379,10 @@ class MapWidgetState extends State<MapWidget>
                 _controller.complete(controller);
               }
               mapController = controller;
-              await _checkGeolocation();
               doCenterNotified = true;
             },
-          ),
-          if (isBlocLoading)
-            Center(
-              child: CircularProgressBar(),
-            )
-        ],
-      ),
-    );
+          )
+        : const Center(child: CircularProgressIndicator());
   }
 
   Set<Marker> getMarkers() {
@@ -416,8 +405,8 @@ class MapWidgetState extends State<MapWidget>
       position: poi.position,
       onTap: () => _handlePOIAction(poi),
       icon: await _getCustomMarkerBitmap(
-        model: poi,
-      ) ??
+            model: poi,
+          ) ??
           BitmapDescriptor.defaultMarker,
     );
   }
@@ -452,71 +441,43 @@ class MapWidgetState extends State<MapWidget>
     // TODO(Filippo) define actions
   }
 
-  /// Check Geo location with permission
-  Future<void> _checkGeolocation() async {
-    final LocationPermission geolocationStatus =
-    await Geolocator.checkPermission();
-    switch (geolocationStatus) {
-      case LocationPermission.denied:
-        final LocationPermission permission =
-        await Geolocator.requestPermission();
-        if (permission == LocationPermission.always ||
-            permission == LocationPermission.whileInUse) {
-          _checkUserLocation();
-        }
-        break;
-      case LocationPermission.whileInUse:
-        _checkUserLocation();
-        break;
-      case LocationPermission.always:
-        _checkUserLocation();
-        break;
-      case LocationPermission.deniedForever:
-        // If Permission denied then show bottom SnackBar
-        break;
-      case LocationPermission.unableToDetermine:
-        break;
-    }
-  }
-
   /// Check User location & move marker to same position with icon
-  void _checkUserLocation() {
-    // If Permission is given then check user GPS is enabled or not
-    // If enabled then move user marker to particular location
-    checkGPS().then((bool isGPSEnabled) async {
-      if (await location.Location().serviceEnabled()) {
-        _userPositionStream = Geolocator.getPositionStream(
-          locationSettings: const LocationSettings(
-            accuracy: LocationAccuracy.bestForNavigation,
-            distanceFilter: 10,
-          ),
-        ).listen((Position position) async {
-          if (doCenterNotified) {
-            widget.centerChangeNotifier.centerMe();
-            if (_lastFetchedPosition == null) {
-              await doRefreshAllPois();
-            }
-            doCenterNotified = false;
-          }
-
-          _currentUserPosition =
-              LatLng(position.latitude, position.longitude);
-
-          if (_currentUserPosition != null &&
-              widget.centerChangeNotifier.isCenterMe) {
-            _moveCamera(_currentUserPosition!);
-          }
-        });
-      }
-    });
-  }
+  // void _checkUserLocation() {
+  //   // If Permission is given then check user GPS is enabled or not
+  //   // If enabled then move user marker to particular location
+  //   checkGPS().then((bool isGPSEnabled) async {
+  //     if (await location.Location().serviceEnabled()) {
+  //       _userPositionStream = Geolocator.getPositionStream(
+  //         locationSettings: const LocationSettings(
+  //           accuracy: LocationAccuracy.bestForNavigation,
+  //           distanceFilter: 10,
+  //         ),
+  //       ).listen((Position position) async {
+  //         if (doCenterNotified) {
+  //           widget.centerChangeNotifier.centerMe();
+  //           if (_lastFetchedPosition == null) {
+  //             await doRefreshAllPois();
+  //           }
+  //           doCenterNotified = false;
+  //         }
+  //
+  //         _currentUserPosition = LatLng(position.latitude, position.longitude);
+  //
+  //         if (_currentUserPosition != null &&
+  //             widget.centerChangeNotifier.isCenterMe) {
+  //           _moveCamera(_currentUserPosition!);
+  //         }
+  //       });
+  //     }
+  //   });
+  // }
 
   /// Get User marker with Icon
   Marker? _getUserMarker() {
-    if (_currentUserPosition != null && _mapMeIcon != null) {
+    if (_mapMeIcon != null) {
       return Marker(
         markerId: MarkerId(MarkerUtils.userMarkerId),
-        position: _currentUserPosition!,
+        position: currentUserPosition,
         icon: _mapMeIcon!,
       );
     }
@@ -539,7 +500,7 @@ class MapWidgetState extends State<MapWidget>
 
       return centerLatLng;
     }
-    return widget.positionInteractor.getUserPosition();
+    return currentUserPosition;
   }
 
   Future<void> setCameraPosition(LatLng position) async {
@@ -590,7 +551,7 @@ class MapWidgetState extends State<MapWidget>
 
     if (model.markerIconUrl.isNotEmpty) {
       final BitmapDescriptor? markerImage =
-      await widget.markerImageUtils.getMarkerImageFromUrl(
+          await widget.markerImageUtils.getMarkerImageFromUrl(
         url,
         context,
       );
@@ -598,7 +559,7 @@ class MapWidgetState extends State<MapWidget>
       return markerImage;
     } else {
       final ByteData bytes =
-      await rootBundle.load('assets/common/icon_marker.png');
+          await rootBundle.load('assets/common/icon_marker.png');
       markerImage = await decodeImageFromList(
         bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes),
       );
@@ -610,14 +571,13 @@ class MapWidgetState extends State<MapWidget>
     );
     mapImageMarkers[url] = bitmap;
     return bitmap;
-      return null;
+    return null;
   }
 
   Future<BitmapDescriptor> generateCustomMarkerWithOnlyIcon(
-      ui.Image markerImage,
-      POIViewModel model,
-      ) async {
-
+    ui.Image markerImage,
+    POIViewModel model,
+  ) async {
     /// Init the [Canvas] and [PictureRecorder]
     final PictureRecorder pictureRecorder = PictureRecorder();
     final Canvas canvas = Canvas(pictureRecorder);
@@ -625,7 +585,7 @@ class MapWidgetState extends State<MapWidget>
 
     /// For management of image marker with Rect
     final Size imageSize =
-    Size(markerImage.width.toDouble(), markerImage.height.toDouble());
+        Size(markerImage.width.toDouble(), markerImage.height.toDouble());
     final Rect src = Offset.zero & imageSize;
 
     final Rect dst = Offset.zero & Size(imageSize.width, imageSize.height);
@@ -657,15 +617,6 @@ class MapWidgetState extends State<MapWidget>
 
     /// return BitmapDescriptor of marker
     return BitmapDescriptor.fromBytes(data!.buffer.asUint8List());
-  }
-
-  Future<bool> checkGPS() async {
-    final bool isGpsEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!isGpsEnabled) {
-      centerClicked = true;
-      return location.Location().requestService();
-    }
-    return false;
   }
 }
 

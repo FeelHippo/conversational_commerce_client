@@ -1,39 +1,59 @@
-import 'package:fimber/fimber.dart';
+import 'dart:async';
+
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class PositionInteractor {
   PositionInteractor();
 
-  Future<LatLng> getUserPosition() async {
+  StreamController<LatLng>? _positionStreamController;
 
-    // defaults to Zurich city center
-    // TODO(Filippo): move this to dotenv
-    final LatLng initialCameraPosition = LatLng(
-      47.3729434,
-      8.5326103,
+  Stream<LatLng> trackPosition() {
+    Timer? timer;
+
+    _positionStreamController ??= StreamController<LatLng>(
+      onCancel: () {
+        timer?.cancel();
+        _positionStreamController?.close();
+      },
+      onListen: () async {
+        timer = Timer.periodic(
+          const Duration(seconds: 5),
+          (Timer timer) async {
+            final bool isGpsEnabled =
+                await Geolocator.isLocationServiceEnabled();
+            if (isGpsEnabled) {
+              final LocationPermission locationPermission =
+                  await Geolocator.checkPermission();
+              switch (locationPermission) {
+                case LocationPermission.always:
+                case LocationPermission.whileInUse:
+                  final Position position = await Geolocator.getCurrentPosition(
+                    forceAndroidLocationManager: true,
+                    desiredAccuracy: LocationAccuracy.bestForNavigation,
+                    timeLimit: const Duration(seconds: 5),
+                  );
+                  _positionStreamController?.add(
+                    LatLng(
+                      position.latitude,
+                      position.longitude,
+                    ),
+                  );
+                  break;
+                case LocationPermission.denied:
+                  await Geolocator.requestPermission();
+                  break;
+                case LocationPermission.deniedForever:
+                  break;
+                default:
+                  await Geolocator.requestPermission();
+              }
+            }
+          },
+        );
+      },
     );
 
-    try {
-      final bool isGpsEnabled = await Geolocator.isLocationServiceEnabled();
-      if (isGpsEnabled) {
-        final LocationPermission locationPermission =
-          await Geolocator.checkPermission();
-        if (locationPermission != LocationPermission.deniedForever &&
-            locationPermission != LocationPermission.denied) {
-          final Position position = await Geolocator.getCurrentPosition(
-            forceAndroidLocationManager: true,
-            desiredAccuracy: LocationAccuracy.bestForNavigation,
-            timeLimit: const Duration(seconds: 5),
-          );
-          return LatLng(position.latitude, position.longitude);
-        }
-      }
-      return initialCameraPosition;
-    } catch (e, stacktrace) {
-      Fimber.e("can't fetch geolocation", ex: e, stacktrace: stacktrace);
-      return initialCameraPosition;
-    }
+    return _positionStreamController!.stream;
   }
-
 }

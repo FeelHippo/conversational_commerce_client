@@ -1,12 +1,12 @@
+import 'package:apiClient/main.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injector/injector.dart';
-import 'package:apiClient/main.dart';
 import 'package:stadtplan/presentation/dashboard_screen/pois_bloc/pois_bloc.dart';
-import 'package:storage/main.dart';
+import 'package:stadtplan/presentation/dashboard_screen/position_bloc/position_bloc.dart';
 import 'package:stadtplan/presentation/dashboard_screen/utils/marker_utils.dart';
 import 'package:stadtplan/presentation/google_search/bloc/bloc.dart';
 import 'package:stadtplan/presentation/modules/app_module.dart';
@@ -16,6 +16,7 @@ import 'package:stadtplan/presentation/modules/domain_module.dart';
 import 'package:stadtplan/presentation/modules/network_module.dart';
 import 'package:stadtplan/presentation/splash/bloc/splash_bloc.dart';
 import 'package:stadtplan/utils/url_opener.dart';
+import 'package:storage/main.dart';
 
 /// Inversion of Control
 /// https://stackoverflow.com/a/3140/10708345
@@ -66,9 +67,11 @@ class IOC {
     /// Data Mappers
     _registerDependency<POIMapper>(DataModule.createPOIMapper);
     _registerDependency<POIsProvider>(DataModule.createPOIsProvider);
-    _registerDependency<DisplayMetricsProvider>(DataModule.createDisplayMetricsProvider);
+    _registerDependency<DisplayMetricsProvider>(
+        DataModule.createDisplayMetricsProvider);
     _registerDependency<GoogleSearchMapper>(DataModule.createGooglePlaceMapper);
-    _registerDependency<PlaceDetailsMapper>(DataModule.createPlaceDetailsMapper);
+    _registerDependency<PlaceDetailsMapper>(
+        DataModule.createPlaceDetailsMapper);
 
     /// App UI
     _registerSingleton<DefaultCacheManager>(
@@ -91,6 +94,7 @@ class IOC {
 
     /// Blocs
     _registerDependency<SplashBloc>(BlocModule.createSplashBloc);
+    _registerDependency<PositionBloc>(BlocModule.createPositionBloc);
     _registerDependency<POIsBloc>(BlocModule.createPOIsBloc);
     _registerDependency<GoogleSearchBloc>(
       BlocModule.createGooglePlacesBloc,
