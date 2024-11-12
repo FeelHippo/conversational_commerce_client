@@ -35,7 +35,6 @@ class POIsBloc extends Bloc<POIsEvent, POIsState> {
       );
 
       final List<POIModel> poisModel = await _poisInteractor.getPOIs();
-      print('||| bloc 2 $poisModel');
       emit(
         state.copyWith(
           pois: poisModel.map(POIViewModel.new).toList(),

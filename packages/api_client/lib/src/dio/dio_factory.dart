@@ -1,12 +1,12 @@
+import 'package:apiClient/src/common/static_map_options_provider.dart';
+import 'package:apiClient/src/interceptors/content_type_interceptor.dart';
+import 'package:apiClient/src/interceptors/locale_interceptor.dart';
+import 'package:apiClient/src/interceptors/os_type_interceptor.dart';
+import 'package:apiClient/src/interceptors/static_map_interceptor.dart';
+import 'package:apiClient/src/locale/locale_provider.dart';
+import 'package:apiClient/src/transformers/response_transformer.dart';
 import 'package:dio/dio.dart';
 
-import '../common/static_map_options_provider.dart';
-import '../interceptors/content_type_interceptor.dart';
-import '../interceptors/locale_interceptor.dart';
-import '../interceptors/os_type_interceptor.dart';
-import '../interceptors/static_map_interceptor.dart';
-import '../locale/locale_provider.dart';
-import '../transformers/response_transformer.dart';
 import 'dio_logger.dart';
 
 class DioFactory {
@@ -27,7 +27,7 @@ class DioFactory {
   ) {
     final BaseOptions options = BaseOptions(
       baseUrl:
-          'https://10.0.2.2:8080/', // wifi ip from command prompt with Git Bash -> ipconfig
+          'http://10.0.2.2:8080/', // wifi ip from command prompt with Git Bash -> ipconfig
       receiveDataWhenStatusError: true,
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
