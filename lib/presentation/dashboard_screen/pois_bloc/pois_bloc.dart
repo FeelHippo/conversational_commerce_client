@@ -1,12 +1,12 @@
 import 'dart:async';
 
+import 'package:apiClient/main.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fimber/fimber.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stadtplan/constants/list_constants.dart';
 import 'package:stadtplan/presentation/dashboard_screen/models/pois_view_model.dart';
-import 'package:apiClient/main.dart';
 
 part 'pois_event.dart';
 part 'pois_state.dart';
@@ -22,9 +22,9 @@ class POIsBloc extends Bloc<POIsEvent, POIsState> {
   final POIsInteractor _poisInteractor;
 
   FutureOr<void> handleFetchPOIs(
-      FetchPOIsEvent event,
-      Emitter<POIsState> emit,
-      ) async {
+    FetchPOIsEvent event,
+    Emitter<POIsState> emit,
+  ) async {
     try {
       emit(
         state.copyWith(
@@ -33,10 +33,9 @@ class POIsBloc extends Bloc<POIsEvent, POIsState> {
           error: null,
         ),
       );
-      final List<POIModel> poisModel = await _poisInteractor.getPOIs(
-        bounds: event.bounds,
-        type: 'ZplExtent:#ZueriPlan.ServiceModel',
-      );
+
+      final List<POIModel> poisModel = await _poisInteractor.getPOIs();
+      print('||| bloc 2 $poisModel');
       emit(
         state.copyWith(
           pois: poisModel.map(POIViewModel.new).toList(),
@@ -49,9 +48,9 @@ class POIsBloc extends Bloc<POIsEvent, POIsState> {
   }
 
   void handleMoveMapToLocation(
-      MoveMapToLocationEvent event,
-      Emitter<POIsState> emit,
-      ) {
+    MoveMapToLocationEvent event,
+    Emitter<POIsState> emit,
+  ) {
     try {
       emit(
         state.copyWith(
@@ -68,9 +67,9 @@ class POIsBloc extends Bloc<POIsEvent, POIsState> {
   }
 
   FutureOr<void> handleFilterPOIs(
-      FilterPOIsEvent event,
-      Emitter<POIsState> emit,
-      ) async {
+    FilterPOIsEvent event,
+    Emitter<POIsState> emit,
+  ) async {
     try {
       emit(
         state.copyWith(
@@ -81,10 +80,9 @@ class POIsBloc extends Bloc<POIsEvent, POIsState> {
       );
       final Map<QuickFilters, bool> quickFilterStatusCopy =
           state.quickFilterStatus ?? ListConstants.quickFilterStatus;
-      quickFilterStatusCopy[
-          QuickFilters.values.firstWhere((
-              QuickFilters value) => value.name == event.filterSelected)
-        ] = !quickFilterStatusCopy[event.filterSelected]!;
+      quickFilterStatusCopy[QuickFilters.values.firstWhere(
+              (QuickFilters value) => value.name == event.filterSelected)] =
+          !quickFilterStatusCopy[event.filterSelected]!;
       emit(
         state.copyWith(
           quickFilterStatus: quickFilterStatusCopy,

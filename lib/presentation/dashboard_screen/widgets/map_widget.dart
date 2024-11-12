@@ -23,6 +23,7 @@ import 'package:stadtplan/presentation/dashboard_screen/widgets/center_change_no
 import 'package:stadtplan/presentation/navigation/app_navigator.dart';
 import 'package:stadtplan/presentation/navigation/app_routes.dart';
 import 'package:stadtplan/presentation/widgets/app_scaffold.dart';
+import 'package:stadtplan/utils/haversine.dart';
 import 'package:stadtplan/utils/snackbar_mixin.dart';
 import 'package:storage/main.dart';
 
@@ -60,11 +61,12 @@ class MapWidgetState extends State<MapWidget>
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
 
-  late PositionBloc _positionBloc;
   late POIsBloc _poisBloc;
 
   late LatLng currentUserPosition;
   late List<POIViewModel> pois;
+
+  int _radius = 5000;
 
   /// User Icon
   BitmapDescriptor? _mapMeIcon;
@@ -114,8 +116,7 @@ class MapWidgetState extends State<MapWidget>
     widget.centerChangeNotifier.addListener(moveCameraToCurrentLocation);
     WidgetsBinding.instance.addObserver(this);
     pois = <POIViewModel>[];
-    _positionBloc = BlocProvider.of<PositionBloc>(context)
-      ..add(StartTrackingPositionEvent());
+    BlocProvider.of<PositionBloc>(context)..add(StartTrackingPositionEvent());
     _poisBloc = BlocProvider.of<POIsBloc>(context);
     initData();
   }
@@ -338,7 +339,6 @@ class MapWidgetState extends State<MapWidget>
 
   /// Build Google Maps with marker & style
   Widget _buildGoogleMaps(bool isReady) {
-    print('||| _buildGoogleMaps ${isReady}');
     return isReady
         ? GoogleMap(
             key: _mapGlobalKey,
@@ -351,7 +351,9 @@ class MapWidgetState extends State<MapWidget>
                       _lastFetchedPosition !=
                           null // map has already been populated with POIs
                   ) {
-                await doRefreshAllPois();
+                if (await needsToRefreshPois()) {
+                  await doRefreshAllPois();
+                }
                 isCameraMoving = false;
                 hasZoomed = false;
               }
@@ -379,6 +381,7 @@ class MapWidgetState extends State<MapWidget>
                 _controller.complete(controller);
               }
               mapController = controller;
+              await doRefreshAllPois();
               doCenterNotified = true;
             },
           )
@@ -414,6 +417,7 @@ class MapWidgetState extends State<MapWidget>
   /// On Camera Move
   Future<void> onCameraMove(CameraPosition position) async {
     if (zoomLevel != position.zoom && mapController != null) {
+      _radius = await _getRadius(mapController!);
       hasZoomed = true;
     }
     zoomLevel = position.zoom;
@@ -422,6 +426,54 @@ class MapWidgetState extends State<MapWidget>
       zoom: zoomLevel,
     );
     isCameraMoving = true;
+  }
+
+  /// return screen radius in meters
+  Future<int> _getRadius(
+    GoogleMapController mapController, {
+    int extent = 2,
+  }) async {
+    final LatLngBounds bounds = await mapController.getVisibleRegion();
+    return Haversine.formula(
+          bounds.northeast.latitude,
+          bounds.northeast.longitude,
+          bounds.southwest.latitude,
+          bounds.southwest.longitude,
+        ).round() *
+        extent;
+  }
+
+  /// This method is triggered when the camera is idle e.g. user has interacted with the map
+  Future<bool> needsToRefreshPois() async {
+    final LatLng currentCenter = await getCenter();
+
+    // center position of last POIs fetch
+    final double lastFetchLon = _lastFetchedPosition?.longitude ?? 0;
+    final double lastFetchLat = _lastFetchedPosition?.latitude ?? 0;
+    // center position of current visible location
+    final double currentLon = currentCenter.longitude;
+    final double currentLat = currentCenter.latitude;
+
+    // _radius is equal to visible map radius in meters * an extent (default == 2)
+    // this means the area considered is wider that the one currently visible
+    // and POIs are fetched for an area wider than the visible one, and cached
+    bool isNewPositionReached = false;
+
+    // Haversine.formula == distance in meters between two coordinates
+    // == distance between last fetch position and current user position e.g. 100m
+    // _radius / 1.5 == (visible map area * extent) / 1.5
+    // e.g. (1000m * 2) / 1.5 = 1333m
+    // == if current position is approaching radius limit => re-fetch POIs
+    // else use the ones cached
+    final bool isApproachingLimit =
+        Haversine.formula(lastFetchLat, lastFetchLon, currentLat, currentLon) >
+            _radius / 1.5;
+
+    if (isApproachingLimit || hasZoomed) {
+      isNewPositionReached = true;
+    }
+
+    return isNewPositionReached;
   }
 
   Future<void> zoomIn(LatLng location) async {
@@ -440,37 +492,6 @@ class MapWidgetState extends State<MapWidget>
   void _handlePOIAction(POIViewModel model) {
     // TODO(Filippo) define actions
   }
-
-  /// Check User location & move marker to same position with icon
-  // void _checkUserLocation() {
-  //   // If Permission is given then check user GPS is enabled or not
-  //   // If enabled then move user marker to particular location
-  //   checkGPS().then((bool isGPSEnabled) async {
-  //     if (await location.Location().serviceEnabled()) {
-  //       _userPositionStream = Geolocator.getPositionStream(
-  //         locationSettings: const LocationSettings(
-  //           accuracy: LocationAccuracy.bestForNavigation,
-  //           distanceFilter: 10,
-  //         ),
-  //       ).listen((Position position) async {
-  //         if (doCenterNotified) {
-  //           widget.centerChangeNotifier.centerMe();
-  //           if (_lastFetchedPosition == null) {
-  //             await doRefreshAllPois();
-  //           }
-  //           doCenterNotified = false;
-  //         }
-  //
-  //         _currentUserPosition = LatLng(position.latitude, position.longitude);
-  //
-  //         if (_currentUserPosition != null &&
-  //             widget.centerChangeNotifier.isCenterMe) {
-  //           _moveCamera(_currentUserPosition!);
-  //         }
-  //       });
-  //     }
-  //   });
-  // }
 
   /// Get User marker with Icon
   Marker? _getUserMarker() {
@@ -539,39 +560,19 @@ class MapWidgetState extends State<MapWidget>
   }) async {
     /// markerImage depends on model.brand
     /// condition for marker background image
-    final String url = model.markerIconUrl;
-    ui.Image? markerImage;
+    final String url = model.iconUrl;
 
-    // markerImageUtils relies on flutter_cache_manager
-    // the implementation is clumsy, for each marker too many
-    // async calls are made. Better use the widget's state
     if (mapImageMarkers[url] != null) {
       return mapImageMarkers[url];
     }
 
-    if (model.markerIconUrl.isNotEmpty) {
-      final BitmapDescriptor? markerImage =
-          await widget.markerImageUtils.getMarkerImageFromUrl(
-        url,
-        context,
-      );
-      mapImageMarkers[url] = markerImage;
-      return markerImage;
-    } else {
-      final ByteData bytes =
-          await rootBundle.load('assets/common/icon_marker.png');
-      markerImage = await decodeImageFromList(
-        bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes),
-      );
-    }
-
-    final BitmapDescriptor bitmap = await generateCustomMarkerWithOnlyIcon(
-      markerImage,
-      model,
+    final BitmapDescriptor? markerImage =
+        await widget.markerImageUtils.getMarkerImageFromUrl(
+      url,
+      context,
     );
-    mapImageMarkers[url] = bitmap;
-    return bitmap;
-    return null;
+    mapImageMarkers[url] = markerImage;
+    return markerImage;
   }
 
   Future<BitmapDescriptor> generateCustomMarkerWithOnlyIcon(

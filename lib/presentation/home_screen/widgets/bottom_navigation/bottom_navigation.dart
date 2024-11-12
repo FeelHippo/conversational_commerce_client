@@ -100,9 +100,7 @@ class BottomNavigationState extends State<BottomNavigation>
                     SizedBox(
                       height: 110,
                       width: 110,
-                      child: widget.selectedIndex == 1
-                          ? ImageAssets.icNavChargeSelected()
-                          : ImageAssets.icNavCharge(),
+                      child: ImageAssets.icLogoZuerich(),
                     ),
                   ],
                 ),

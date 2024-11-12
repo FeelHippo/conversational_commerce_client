@@ -49,7 +49,6 @@ class IOC {
       DataModule.createFlutterSecureStorage,
     );
     _registerDependency<DateMapper>(DataModule.createDateMapper);
-    _registerDependency<LocationMapper>(DataModule.createLocationMapper);
     _registerDependency<StaticMapOptionsProvider>(
       DataModule.createStaticMapOptionsProvider,
     );

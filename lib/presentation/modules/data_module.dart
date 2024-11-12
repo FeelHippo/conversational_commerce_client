@@ -1,6 +1,6 @@
+import 'package:apiClient/main.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injector/injector.dart';
-import 'package:apiClient/main.dart';
 import 'package:storage/main.dart';
 
 class DataModule {
@@ -10,15 +10,12 @@ class DataModule {
   static DateMapper createDateMapper(Injector injector) => const DateMapper();
 
   static StaticMapOptionsProvider createStaticMapOptionsProvider(
-      Injector injector,
-      ) =>
+    Injector injector,
+  ) =>
       StaticMapOptionsProvider(injector.get<DisplayMetricsProvider>());
 
   static LocaleProvider createLocaleProvider(Injector injector) =>
       LocaleProvider();
-
-  static LocationMapper createLocationMapper(Injector injector) =>
-      const LocationMapper();
 
   static UserPreferences createUserPreferences(Injector injector) =>
       StoreUserPreferences();
@@ -28,9 +25,7 @@ class DataModule {
   ) =>
       DisplayMetricsProvider();
 
-  static POIMapper createPOIMapper(Injector injector) => POIMapper(
-        injector.get<LocationMapper>(),
-      );
+  static POIMapper createPOIMapper(Injector injector) => POIMapper();
 
   static POIsProvider createPOIsProvider(Injector injector) =>
       NetworkPOIsProvider(

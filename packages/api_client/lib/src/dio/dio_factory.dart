@@ -26,7 +26,8 @@ class DioFactory {
     StaticMapOptionsProvider staticMapOptionsProvider,
   ) {
     final BaseOptions options = BaseOptions(
-      baseUrl: 'https://www.maps.stadt-zuerich.ch', // TODO(Filippo): replace with dotenv
+      baseUrl:
+          'https://10.0.2.2:8080/', // wifi ip from command prompt with Git Bash -> ipconfig
       receiveDataWhenStatusError: true,
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
