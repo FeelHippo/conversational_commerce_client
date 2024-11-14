@@ -1,6 +1,5 @@
+import 'package:apiClient/src/common/date_mapper.dart';
 import 'package:json_annotation/json_annotation.dart';
-
-import '../common/date_mapper.dart';
 
 class DateTimeConverter implements JsonConverter<DateTime, String> {
   const DateTimeConverter();

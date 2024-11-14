@@ -1,5 +1,5 @@
-import '../../dto/predictions_dto.dart';
-import '../models/predictions_model.dart';
+import 'package:apiClient/src/dto/predictions_dto.dart';
+import 'package:apiClient/src/google_search/models/predictions_model.dart';
 
 class GoogleSearchMapper {
   const GoogleSearchMapper();

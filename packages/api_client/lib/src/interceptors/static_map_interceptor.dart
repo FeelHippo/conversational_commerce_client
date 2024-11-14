@@ -1,6 +1,5 @@
+import 'package:apiClient/src/common/static_map_options_provider.dart';
 import 'package:dio/dio.dart';
-
-import '../common/static_map_options_provider.dart';
 
 class StaticMapInterceptor extends Interceptor {
   StaticMapInterceptor(this._staticMapOptionsProvider);

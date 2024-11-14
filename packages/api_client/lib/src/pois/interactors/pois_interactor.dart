@@ -1,5 +1,5 @@
-import '../models/pois_model.dart';
-import '../providers/pois_provider.dart';
+import 'package:apiClient/src/pois/models/pois_model.dart';
+import 'package:apiClient/src/pois/providers/pois_provider.dart';
 
 class POIsInteractor {
   POIsInteractor(this._poisProvider);

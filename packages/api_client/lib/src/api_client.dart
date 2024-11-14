@@ -9,6 +9,6 @@ part 'api_client.g.dart';
 abstract class ApiClient {
   factory ApiClient(Dio dio) = _ApiClient;
   // Fetches POIs for an unauthenticated user
-  @GET('/view-zuerivelo-publibike')
+  @GET('view-zuerivelo-publibike')
   Future<List<POIDto>> getPOIs();
 }

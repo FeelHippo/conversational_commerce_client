@@ -1,4 +1,4 @@
-import '../models/pois_model.dart';
+import 'package:apiClient/src/pois/models/pois_model.dart';
 
 abstract class POIsProvider {
   Future<List<POIModel>> getPOIs();

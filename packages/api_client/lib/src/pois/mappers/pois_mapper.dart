@@ -1,5 +1,5 @@
-import '../../dto/pois_dto.dart';
-import '../models/pois_model.dart';
+import 'package:apiClient/src/dto/pois_dto.dart';
+import 'package:apiClient/src/pois/models/pois_model.dart';
 
 class POIMapper {
   POIMapper();

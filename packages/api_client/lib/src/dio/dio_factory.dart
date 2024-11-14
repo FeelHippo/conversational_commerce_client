@@ -27,7 +27,7 @@ class DioFactory {
   ) {
     final BaseOptions options = BaseOptions(
       baseUrl:
-          'http://10.0.2.2:8080/', // wifi ip from command prompt with Git Bash -> ipconfig
+          'http://ec2-16-170-122-157.eu-north-1.compute.amazonaws.com/', // wifi ip from command prompt with Git Bash -> ipconfig
       receiveDataWhenStatusError: true,
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),

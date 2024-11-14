@@ -1,6 +1,6 @@
+import 'package:apiClient/src/locale/locale_provider.dart';
 import 'package:dio/dio.dart';
 
-import '../locale/locale_provider.dart';
 class LocaleInterceptor extends Interceptor {
   LocaleInterceptor(this._localeProvider);
   final LocaleProvider _localeProvider;

@@ -1,6 +1,6 @@
-import '../providers/google_search_provider.dart';
-import '../models/place_details_model.dart';
-import '../models/predictions_model.dart';
+import 'package:apiClient/src/google_search/models/place_details_model.dart';
+import 'package:apiClient/src/google_search/models/predictions_model.dart';
+import 'package:apiClient/src/google_search/providers/google_search_provider.dart';
 
 class GoogleSearchInteractor {
   GoogleSearchInteractor({
@@ -17,7 +17,8 @@ class GoogleSearchInteractor {
       'input': input,
       'components': 'country:ch|country:fr|country:de||country:it',
       'sessiontoken': sessionToken,
-      'key': 'AIzaSyAWhjEQx7GXREyhhMV9OC1iGJpWXuktAmg', // TODO(Filippo): replace with dotenv
+      'key':
+          'AIzaSyAWhjEQx7GXREyhhMV9OC1iGJpWXuktAmg', // TODO(Filippo): replace with dotenv
     };
     final Uri uri = Uri.https(
       'maps.googleapis.com',
@@ -35,7 +36,8 @@ class GoogleSearchInteractor {
     final Map<String, String> queryParameters = <String, String>{
       'place_id': placeId,
       'sessiontoken': sessionToken,
-      'key': 'AIzaSyAWhjEQx7GXREyhhMV9OC1iGJpWXuktAmg', // TODO(Filippo): replace with dotenv
+      'key':
+          'AIzaSyAWhjEQx7GXREyhhMV9OC1iGJpWXuktAmg', // TODO(Filippo): replace with dotenv
     };
     final Uri uri = Uri.https(
       'maps.googleapis.com',
