@@ -7,19 +7,18 @@ import 'package:stadtplan/utils/snackbar_mixin.dart';
 import 'app_routes.dart';
 
 class AppNavigator {
-
   AppNavigator(
-      this.navigatorKey,
-      this.bottomNavigationController,
-      this.snackBarHandler,
-      );
+    this.navigatorKey,
+    this.bottomNavigationController,
+    this.snackBarHandler,
+  );
 
   final GlobalKey<NavigatorState> navigatorKey;
   final BottomNavigationController bottomNavigationController;
   final SnackBarHandler snackBarHandler;
 
   static AppNavigator of(BuildContext context) {
-    return Provider.of<AppNavigator>(context, listen: false);
+    return context.read<AppNavigator>();
   }
 
   @optionalTypeArgs

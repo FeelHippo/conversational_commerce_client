@@ -1,14 +1,13 @@
 import 'dart:io';
 
+import 'package:apiClient/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stadtplan/constants/list_constants.dart';
-import 'package:apiClient/main.dart';
 import 'package:stadtplan/presentation/dashboard_screen/pois_bloc/pois_bloc.dart';
 import 'package:stadtplan/presentation/navigation/app_navigator.dart';
 import 'package:stadtplan/presentation/navigation/app_routes.dart';
 import 'package:stadtplan/presentation/widgets/app_card.dart';
-import 'package:stadtplan/presentation/widgets/textlabels/text_paragraph_regular.dart';
 import 'package:stadtplan/themes/constants/palette.dart';
 import 'package:stadtplan/themes/constants/spacings.dart';
 
@@ -18,28 +17,28 @@ class QuickFilterWidget extends StatefulWidget {
   });
 
   static Key quickFilterWidgetWidgetLoadingCircularProgressIndicatorKey =
-  const Key('QuickFilterWidget-Loading-circularProgressIndicator');
+      const Key('QuickFilterWidget-Loading-circularProgressIndicator');
 
   static Key quickFilterWidgetLogoImageKey =
-  const Key('QuickFilterWidget-Logo-image');
+      const Key('QuickFilterWidget-Logo-image');
 
   static Key quickFilterWidgetSearchImageKey =
-  const Key('QuickFilterWidget-Search-image');
+      const Key('QuickFilterWidget-Search-image');
 
   static Key quickFilterWidgetPowerImageKey =
-  const Key('QuickFilterWidget-Power-image');
+      const Key('QuickFilterWidget-Power-image');
 
   static Key quickFilterWidgetFastImageKey =
-  const Key('QuickFilterWidget-Fast-image');
+      const Key('QuickFilterWidget-Fast-image');
 
   static Key quickFilterWidgetDisplayNameLabelKey =
-  const Key('QuickFilterWidget-display-name-label');
+      const Key('QuickFilterWidget-display-name-label');
 
   static Key quickFilterWidgetSearchInkWellKey =
-  const Key('QuickFilterWidget-search-InkWell');
+      const Key('QuickFilterWidget-search-InkWell');
 
   static Key quickFilterWidgetFilterInkWellKey =
-  const Key('QuickFilterWidget-filter-InkWell');
+      const Key('QuickFilterWidget-filter-InkWell');
 
   @override
   State<QuickFilterWidget> createState() => _QuickFilterWidgetState();
@@ -61,12 +60,14 @@ class _QuickFilterWidgetState extends State<QuickFilterWidget> {
   bool isLoading = false;
   late Map<QuickFilters, bool> quickFilterStatus;
   late POIsBloc _poisBloc;
+  late AppNavigator _appNavigator;
 
   @override
   void initState() {
     super.initState();
     quickFilterStatus = ListConstants.quickFilterStatus;
     _poisBloc = BlocProvider.of<POIsBloc>(context);
+    _appNavigator = AppNavigator.of(context);
   }
 
   @override
@@ -112,9 +113,9 @@ class _QuickFilterWidgetState extends State<QuickFilterWidget> {
               itemCount: listQuickFilter.length,
               itemBuilder: (BuildContext context, int index) {
                 final AcoisModel acoisViewModel =
-                  listQuickFilter.elementAt(index);
+                    listQuickFilter.elementAt(index);
                 final bool? currentStatus =
-                quickFilterStatus[acoisViewModel.mode];
+                    quickFilterStatus[acoisViewModel.mode];
                 if (acoisViewModel.mode == QuickFilters.search) {
                   return Row(
                     children: <Widget>[
@@ -125,20 +126,19 @@ class _QuickFilterWidgetState extends State<QuickFilterWidget> {
                           key: QuickFilterWidget
                               .quickFilterWidgetSearchInkWellKey,
                           onTap: () {
-                            AppNavigator.of(context).push(
+                            _appNavigator.push(
                               AppRoutes.googleSearchAddressScreen(
                                 isFromMapScreen: true,
                                 onAddressSelected: (AddressModel model) {
                                   onPredictionTap(model);
-                                  AppNavigator.of(context).pop();
+                                  _appNavigator.pop();
                                 },
                               ),
                             );
                           },
                           child: ColorFiltered(
                               colorFilter: ColorFilter.mode(
-                                  Palette.grey50,
-                                  BlendMode.srcATop),
+                                  Palette.grey50, BlendMode.srcATop),
                               child: acoisViewModel.image),
                         ),
                         decoration: BoxDecoration(
@@ -169,8 +169,7 @@ class _QuickFilterWidgetState extends State<QuickFilterWidget> {
                           children: <Widget>[
                             Padding(
                               padding: const EdgeInsets.only(
-                                  left: Spacings.medium,
-                                  right: Spacings.small),
+                                  left: Spacings.medium, right: Spacings.small),
                               child: ColorFiltered(
                                   colorFilter: ColorFilter.mode(
                                       currentStatus ?? true
