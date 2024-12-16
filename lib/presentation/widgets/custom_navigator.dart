@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 
+/// Creates a widget that maintains a stack-based history of child widgets.
 class CustomNavigator extends StatefulWidget {
   const CustomNavigator(
       {Key? key, this.navigatorKey, required this.onGenerateRoute})

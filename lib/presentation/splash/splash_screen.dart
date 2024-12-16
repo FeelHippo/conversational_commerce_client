@@ -41,12 +41,20 @@ class SplashScreen extends StatelessWidget {
                   GlobalKey<NavigatorState>();
               return CustomNavigator(
                 navigatorKey: rootNavigatorKey,
-                onGenerateRoute: (_) => PageRouteBuilder<dynamic>(
-                  pageBuilder: (_, __, ___) => HomeScreen(
-                    rootNavigatorKey: rootNavigatorKey,
-                    userPreferences: ioc.getDependency<UserPreferences>(),
-                  ),
-                ),
+                onGenerateRoute: (RouteSettings settings) {
+                  // define top of the navigation stack
+                  // in home_screen.dart the AppNavigator is instantiated
+                  // and passed to a Provider, so as to make it available
+                  // down the tree
+                  WidgetBuilder builder = (BuildContext context) => HomeScreen(
+                        rootNavigatorKey: rootNavigatorKey,
+                        userPreferences: ioc.getDependency<UserPreferences>(),
+                      );
+                  return MaterialPageRoute<void>(
+                    builder: builder,
+                    settings: settings,
+                  );
+                },
               );
             },
           ),

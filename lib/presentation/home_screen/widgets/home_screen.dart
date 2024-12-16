@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:storage/main.dart';
 import 'package:stadtplan/injector.dart';
 import 'package:stadtplan/presentation/dashboard_screen/widgets/dashboard_screen.dart';
 import 'package:stadtplan/presentation/home_screen/bottom_navigation_controller.dart';
@@ -10,6 +9,7 @@ import 'package:stadtplan/presentation/widgets/app_scaffold.dart';
 import 'package:stadtplan/themes/assets.dart';
 import 'package:stadtplan/themes/constants/palette.dart';
 import 'package:stadtplan/utils/snackbar_mixin.dart';
+import 'package:storage/main.dart';
 
 part 'tab_switching_view.dart';
 
@@ -29,7 +29,6 @@ class HomeScreen extends StatefulWidget {
 class HomeScreenState extends State<HomeScreen>
     with TickerProviderStateMixin
     implements BottomNavigationController {
-
   int _currentPageIndex = 0;
   final List<NavigationPageView> _pages = <NavigationPageView>[];
   late AnimationController _controller;

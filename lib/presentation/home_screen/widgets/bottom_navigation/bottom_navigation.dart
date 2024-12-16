@@ -38,14 +38,18 @@ class BottomNavigationState extends State<BottomNavigation>
       clipBehavior: Clip.none,
       alignment: Alignment.center,
       children: <Widget>[
+        Positioned.fill(
+          top: -(circleSize + circleOutline + shadowAllowance) / 2,
+          child: AbsorbPointer(),
+        ),
         Container(
           height: barHeight,
           decoration: BoxDecoration(
-            color: Palette.appCardColor,
+            color: Colors.white,
             boxShadow: const <BoxShadow>[
               BoxShadow(
                 offset: Offset(0, -2),
-                color: Colors.black12,
+                color: Colors.white70,
                 blurRadius: 2,
               ),
             ],
@@ -71,10 +75,9 @@ class BottomNavigationState extends State<BottomNavigation>
             onTap: () {
               widget.onItemSelected(1);
             },
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 15),
-              child: FractionallySizedBox(
-                widthFactor: 1 / 5,
+            child: Container(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 15),
                 child: Stack(
                   alignment: Alignment.center,
                   children: <Widget>[
@@ -86,6 +89,12 @@ class BottomNavigationState extends State<BottomNavigation>
                           height: circleSize + circleOutline,
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
+                            boxShadow: <BoxShadow>[
+                              BoxShadow(
+                                color: Colors.blueAccent,
+                                blurRadius: 20,
+                              )
+                            ],
                           ),
                         ),
                       ),
@@ -94,12 +103,12 @@ class BottomNavigationState extends State<BottomNavigation>
                       height: arcHeight,
                       width: arcWidth,
                       child: CustomPaint(
-                        painter: HalfPainter(Palette.appCardColor),
+                        painter: HalfPainter(Colors.white),
                       ),
                     ),
                     SizedBox(
-                      height: 110,
-                      width: 110,
+                      height: 50,
+                      width: 50,
                       child: ImageAssets.icLogoZuerich(),
                     ),
                   ],
