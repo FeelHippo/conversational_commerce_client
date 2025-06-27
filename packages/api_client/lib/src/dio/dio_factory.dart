@@ -15,7 +15,8 @@ class DioFactory {
 
   static Dio create() {
     final BaseOptions options = BaseOptions(
-      baseUrl: 'http://192.168.1.100:8080',
+      baseUrl:
+          'https://conversational-commerce-152603240289.europe-west1.run.app',
       receiveDataWhenStatusError: true,
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
