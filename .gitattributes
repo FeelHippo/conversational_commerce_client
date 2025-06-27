@@ -1,5 +1,0 @@
-# Google Maps API Key
-ios/Runner/AppDelegate.swift filter=git-crypt diff=git-crypt
-android/app/src/main/AndroidManifest.xml filter=git-crypt diff=git-crypt
-# Environment variables
-.env

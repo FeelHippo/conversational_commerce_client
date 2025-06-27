@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = "ch.stadtplan.zurich"
+    namespace = "ch.filippo.zurich"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -23,7 +23,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "ch.stadtplan.zurich"
+        applicationId = "ch.filippo.zurich"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 21
