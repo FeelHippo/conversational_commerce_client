@@ -1,14 +1,10 @@
+import 'package:conversational_commerce/bloc/bloc.dart';
+import 'package:conversational_commerce/injector.dart';
+import 'package:conversational_commerce/presentation/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
-import 'package:stadtplan/injector.dart';
-import 'package:stadtplan/presentation/dashboard_screen/pois_bloc/pois_bloc.dart';
-import 'package:stadtplan/presentation/dashboard_screen/position_bloc/position_bloc.dart';
-import 'package:stadtplan/presentation/home_screen/widgets/home_screen.dart';
-import 'package:stadtplan/presentation/splash/bloc/splash_bloc.dart';
-import 'package:stadtplan/presentation/widgets/custom_navigator.dart';
-import 'package:storage/main.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -19,19 +15,9 @@ class SplashScreen extends StatelessWidget {
       builder: (BuildContext context, IOC ioc, Widget? child) {
         return MultiBlocProvider(
           providers: <SingleChildWidget>[
-            BlocProvider<SplashBloc>(
+            BlocProvider<MessageBloc>(
               create: (BuildContext context) {
-                return ioc.getDependency<SplashBloc>();
-              },
-            ),
-            BlocProvider<PositionBloc>(
-              create: (BuildContext context) {
-                return ioc.getDependency<PositionBloc>();
-              },
-            ),
-            BlocProvider<POIsBloc>(
-              create: (BuildContext context) {
-                return ioc.getDependency<POIsBloc>();
+                return ioc.getDependency<MessageBloc>();
               },
             ),
           ],
@@ -39,22 +25,8 @@ class SplashScreen extends StatelessWidget {
             builder: (BuildContext context, IOC ioc, Widget? child) {
               final GlobalKey<NavigatorState> rootNavigatorKey =
                   GlobalKey<NavigatorState>();
-              return CustomNavigator(
-                navigatorKey: rootNavigatorKey,
-                onGenerateRoute: (RouteSettings settings) {
-                  // define top of the navigation stack
-                  // in home_screen.dart the AppNavigator is instantiated
-                  // and passed to a Provider, so as to make it available
-                  // down the tree
-                  WidgetBuilder builder = (BuildContext context) => HomeScreen(
-                        rootNavigatorKey: rootNavigatorKey,
-                        userPreferences: ioc.getDependency<UserPreferences>(),
-                      );
-                  return MaterialPageRoute<void>(
-                    builder: builder,
-                    settings: settings,
-                  );
-                },
+              return AppScaffold(
+                body: Container(),
               );
             },
           ),

@@ -1,61 +1,61 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:fimber/fimber.dart';
-import 'package:stadtplan/utils/google_services/firebase_options.dart';
+import 'package:conversational_commerce/injector.dart';
+import 'package:conversational_commerce/presentation/splash/splash_screen.dart';
+import 'package:conversational_commerce/presentation/widgets/scope_widget.dart';
+import 'package:conversational_commerce/themes/theme.dart';
+import 'package:conversational_commerce/utils/dashboard_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:stadtplan/injector.dart';
-import 'package:stadtplan/presentation/splash/splash_screen.dart';
-import 'package:stadtplan/presentation/widgets/scope_widget.dart';
-import 'package:stadtplan/themes/theme.dart';
-import 'package:stadtplan/utils/dashboard_controller.dart';
-import 'package:stadtplan/utils/google_services/google_maps.dart';
 
 Future<void> main() async {
   await runZonedGuarded<Future<void>>(
     () async {
-
       WidgetsFlutterBinding.ensureInitialized();
-
-      await setUp();
 
       DashboardController.preserve();
 
       final IOC ioc = IOC.appScope();
 
       runApp(
-        AutoSenseApp(scope: ioc),
+        ChatToolApp(scope: ioc),
       );
 
       Bloc.observer = SimpleBlocDelegate();
       DashboardController.remove();
     },
-    (Object error, StackTrace stackTrace) => Fimber.e('$error, $stackTrace'),
+    (Object error, StackTrace stackTrace) => print('$error, $stackTrace'),
   );
-}
-
-Future<void> setUp() async {
-  await dotenv.load(
-    fileName: '.env',
-    mergeWith: Platform.environment,
-  );
-  await Permission.location.request();
-  await initFirebase();
-  await initGoogleMaps();
 }
 
 class SimpleBlocDelegate extends BlocObserver {
   @override
-  void onError(BlocBase<dynamic> bloc, Object error, StackTrace stackTrace) {
+  void onCreate(BlocBase bloc) {
+    super.onCreate(bloc);
+    print('onCreate -- ${bloc.runtimeType}');
+  }
+
+  @override
+  void onChange(BlocBase bloc, Change change) {
+    super.onChange(bloc, change);
+    print('onChange -- ${bloc.runtimeType}');
+  }
+
+  @override
+  void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
+    print('onError -- ${bloc.runtimeType} error: ${error}');
     super.onError(bloc, error, stackTrace);
+  }
+
+  @override
+  void onClose(BlocBase bloc) {
+    print('onClose -- ${bloc.runtimeType}');
+    super.onClose(bloc);
   }
 }
 
-class AutoSenseApp extends StatelessWidget {
-  const AutoSenseApp({super.key, required this.scope});
+class ChatToolApp extends StatelessWidget {
+  const ChatToolApp({super.key, required this.scope});
   final IOC scope;
 
   @override
@@ -63,7 +63,7 @@ class AutoSenseApp extends StatelessWidget {
     return ScopeWidget(
       scope: scope,
       child: MaterialApp(
-        theme: AppTheme.androidTheme(),
+        theme: AppTheme.lightTheme(),
         home: const SplashScreen(),
       ),
     );

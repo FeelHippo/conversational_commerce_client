@@ -1,5 +1,5 @@
+import 'package:conversational_commerce/themes/constants/palette.dart';
 import 'package:flutter/material.dart';
-import 'package:stadtplan/themes/constants/palette.dart';
 
 class CircularProgressBar extends StatelessWidget {
   const CircularProgressBar(
@@ -15,7 +15,7 @@ class CircularProgressBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return CircularProgressIndicator(
       key: widgetKey,
-      valueColor: AlwaysStoppedAnimation<Color>(color ?? Palette.primary),
+      valueColor: AlwaysStoppedAnimation<Color>(color ?? Palette.brandPrimary),
       strokeWidth: strokeWidth,
     );
   }

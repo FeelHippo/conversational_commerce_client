@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:conversational_commerce/presentation/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
-import 'package:stadtplan/presentation/widgets/app_scaffold.dart';
 
 class ConnectivityContainerWidget extends StatelessWidget {
   @override

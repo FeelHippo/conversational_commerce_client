@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:conversational_commerce/presentation/widgets/connectivity_widget.dart';
+import 'package:conversational_commerce/themes/constants/palette.dart';
+import 'package:conversational_commerce/themes/constants/spacings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:stadtplan/presentation/widgets/connectivity_widget.dart';
-import 'package:stadtplan/themes/constants/palette.dart';
-import 'package:stadtplan/themes/constants/spacings.dart';
 
 class AppScaffold extends StatefulWidget {
   const AppScaffold({
@@ -85,7 +85,7 @@ class AppScaffoldState extends State<AppScaffold> {
     return Scaffold(
       appBar: widget.appBar,
       resizeToAvoidBottomInset: widget.resizeToAvoidBottomPadding,
-      backgroundColor: Palette.appScaffoldColor,
+      backgroundColor: Palette.background,
       bottomNavigationBar: widget.bottomNavigationBar,
       body: Stack(
         children: <Widget>[
@@ -125,7 +125,6 @@ enum AppSnackBarSeverity {
   info,
   success,
   error,
-  freemium,
 }
 
 class AppSnackBar extends StatefulWidget {
@@ -226,8 +225,8 @@ class _AppSnackBarState extends State<AppSnackBar>
                 padding: const EdgeInsets.all(6),
                 child: DefaultTextStyle.merge(
                   maxLines: 2,
-                  style: const TextStyle(
-                    color: Palette.white,
+                  style: TextStyle(
+                    color: Palette.contentPrimary,
                     fontSize: 16,
                   ),
                   child: widget.content ?? const SizedBox(),
@@ -244,15 +243,12 @@ class _AppSnackBarState extends State<AppSnackBar>
   Color _buildBackgroundColor() {
     switch (widget.severity) {
       case AppSnackBarSeverity.error:
-        return Palette.error;
+        return Palette.contentNegative;
       case AppSnackBarSeverity.info:
-        return Palette.primary;
       case AppSnackBarSeverity.success:
-        return Palette.success;
-      case AppSnackBarSeverity.freemium:
-        return Palette.grey50;
+        return Palette.contentPositive;
       case null:
-        return Palette.primary;
+        return Palette.contentPrimary;
     }
   }
 

@@ -1,95 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:stadtplan/utils/dotenv_utils.dart';
 
 class Palette {
-  static Color primary = parseEnvValue('PRIMARY');
-  static Color secondary = parseEnvValue('SECONDARY');
-  static Color error = parseEnvValue('ERROR');
-  static Color success = parseEnvValue('SUCCESS');
-  static Color warning = parseEnvValue('WARNING');
-  static Color appScaffoldColor = parseEnvValue('APP_SCAFFOLD_COLOR');
-  static Color appCardColor = parseEnvValue('APP_CARD_COLOR');
-  static Color greyMain = parseEnvValue('GREY_MAIN');
-  static Color greyDark = parseEnvValue('GREY_DARK');
-  static Color grey80 = parseEnvValue('GREY_80');
-  static Color grey50 = parseEnvValue('GREY_50');
-  static Color grey20 = parseEnvValue('GREY_20');
-  static Color grey10 = parseEnvValue('GREY_10');
-  static Color grey05 = parseEnvValue('GREY_05');
-  static Color buttonBgColor = parseEnvValue('BUTTON_BG_COLOR');
-  static Color buttonTextColor = parseEnvValue('BUTTON_TEXT_COLOR');
-  static Color buttonSecondaryBgColor =
-      parseEnvValue('BUTTON_SECONDARY_BG_COLOR');
-  static Color buttonSecondaryTextColor =
-      parseEnvValue('BUTTON_SECONDARY_TEXT_COLOR');
+  // Dark
+  static Color backgroundDark = Color(0xff09090a);
+  static Color surface0Dark = Color(0xff1e1e20);
+  static Color surface1Dark = Color(0xff2b2b2c);
+  static Color surface2Dark = Color(0xff6b6b6c);
+  static Color surface3Dark = Color(0xffadadad);
+  static Color surfaceAlwaysDarkDark = Color(0xff1e1e20);
+  static Color contentPrimaryDark = Color(0xff1e1e20);
+  static Color contentSecondaryDark = Color(0xffbbbbbc);
+  static Color contentTertiaryDark = Color(0xff737373);
+  static Color contentPositiveDark = Color(0xff6399bb);
+  static Color transparentOverlayDark = Color(0xff1e1e20);
+  static Color transparentOverlayButtonDark = Color(0xff4b4b4d);
+  static Color transparentOverlayLightDark = Color(0xff4b4b4d);
+  static Color secondaryButtonDark = Color(0xcc35383f);
+  static Color secondaryButtonContentDark = Color(0xccffffff);
 
-  static Color switchOnBackgroundColor =
-      parseEnvValue('SWITCH_ON_BACKGROUND_COLOR');
-  static Color switchOffBackgroundColor =
-      parseEnvValue('SWITCH_OFF_BACKGROUND_COLOR');
-  static Color switchOffColor = parseEnvValue('SWITCH_OFF_COLOR');
-  static Color switchOnColor = parseEnvValue('SWITCH_ON_COLOR');
-  static Color switchOffLineColor = parseEnvValue('SWITCH_OFF_LINE_COLOR');
-  static Color switchOnLineColor = parseEnvValue('SWITCH_ON_LINE_COLOR');
+  // Light
+  static Color background = Color(0xffffffff);
+  static Color surface0 = Color(0xfff6f7f8);
+  static Color surface1 = Color(0xffe3e6e9);
+  static Color surface2 = Color(0xffcbcbcc);
+  static Color surface3 = Color(0xffadadad);
+  static Color surfaceAlwaysDark = Color(0xff8c8c8e);
+  static Color contentPrimary = Color(0xffffffff);
+  static Color contentSecondary = Color(0xff757575);
+  static Color contentTertiary = Color(0xff8c8c8e);
+  static Color contentPositive =
+      Color(0xff457b9d); // text color => see expenses / owes money / bars
+  static Color transparentOverlay = Color(0xfffafafa);
+  static Color transparentOverlayButton = Color(0xff4b4b4d);
+  static Color secondaryButton = Color(0xffe3ecf3);
+  static Color secondaryButtonContent = Color(0xff457b9d);
 
-  static const Color dark_333333 = Color(0xff333333);
-  static const Color grey_main_575757 = Color(0xff575757);
-  static const Color grey_50_ababab = Color(0xffababab);
-  static const Color grey_50_9a9a9a = Color(0xff9A9A9A);
-  static const Color lightgrey_f3f3f2 = Color(0xfff3f3f2);
-  static const Color white = Color(0xffffffff);
-  static const Color black = Color(0xff000000);
-
-  static const Color obsolete = Color(0xfff5f5f5);
-  static const Color obsolete_aaaaaa_obsolete = Color(0xffaaaaaa);
-
-  static const Color violet_ab517c = Color(0xffab517c);
-  static const Color Colororange_ef7844 = Color(0xffef7844);
-  static const Color light_blue_5995ed = Color(0xff5995ed);
-  static const Color messageDetailsColor = Color(0xffd8d8d8);
-  static const Color blue_172183 = Color(0xff172183);
-  static const Color purple_801977 = Color(0xff801977);
-  static const Color dark_green = Color(0xff006431);
-
-  static const Color grey_50_b3b3b3 = Color(0xffb3b3b3);
-  static const Color grey_e8e8e8 = Color(0xffe8e8e8);
-
-  // ignore: constant_identifier_names
-  static const Color grey_main = Color(0xff6d6d6d);
+  // Common
+  static Color contentLink = Color(0xff5da9d9);
+  static Color contentNegative = Color(0xffd34e24);
+  static Color contentWarning = Color(0xfff4b942);
+  static Color contentAlwaysWhite = Color(0xffffffff);
+  static Color contentAlwaysWhite0 = Color(0xffbbbbbc);
+  static Color contentAlwaysBlack = Color(0xff09090a);
+  static Color transparentOverlayLight = Color(0xffcbcbcc);
+  static Color brandPrimary = Color(0xff457b9d);
 
   static const int opacity20 = 0x33;
   static const int opacity90 = 0xE6;
-
-  /// color const
-  static const Color benzin95 = Color(0xff469500);
-
-  /// color const
-  static const Color benzin98 = Color(0xff1e6200);
-
-  /// color const
-  static const Color vPower = Color(0xffbca500);
-
-  // Services
-  static const Color zurichBlue = Color(0xff2167ae);
-  static const Color simpegoRed = Color(0xffff7c7c);
-  static const Color amagGrey = Color(0xff6f6d6a);
-  static const Color orangeF3A51B = Color(0xffF3A51B);
-
-  static const Color blue1FB1E6 = Color(0xff1FB1E6);
-  static const Color red_ff7569 = Color(0xffFF7569);
-
-  static Color parseEnvValue(String variable) {
-    return Color(DotenvUtils.getInt(variable));
-  }
-}
-
-class HexColor extends Color {
-  HexColor(String hexColor) : super(_getColorFromHex(hexColor));
-  static int _getColorFromHex(String hexColor) {
-    String color = hexColor.toUpperCase().replaceAll('#', '');
-    if (color.length == 6) {
-      color = 'FF$hexColor';
-    }
-    return int.parse(color, radix: 16);
-  }
 }

@@ -1,6 +1,6 @@
+import 'package:conversational_commerce/injector.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:stadtplan/injector.dart';
 
 class ScopeWidget extends StatelessWidget {
   const ScopeWidget({super.key, required this.child, required this.scope});

@@ -1,22 +1,7 @@
 import 'package:apiClient/main.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injector/injector.dart';
-import 'package:stadtplan/presentation/dashboard_screen/pois_bloc/pois_bloc.dart';
-import 'package:stadtplan/presentation/dashboard_screen/position_bloc/position_bloc.dart';
-import 'package:stadtplan/presentation/dashboard_screen/utils/marker_utils.dart';
-import 'package:stadtplan/presentation/google_search/bloc/bloc.dart';
-import 'package:stadtplan/presentation/modules/app_module.dart';
-import 'package:stadtplan/presentation/modules/bloc_module.dart';
-import 'package:stadtplan/presentation/modules/data_module.dart';
-import 'package:stadtplan/presentation/modules/domain_module.dart';
-import 'package:stadtplan/presentation/modules/network_module.dart';
-import 'package:stadtplan/presentation/splash/bloc/splash_bloc.dart';
-import 'package:stadtplan/utils/url_opener.dart';
-import 'package:storage/main.dart';
 
 /// Inversion of Control
 /// https://stackoverflow.com/a/3140/10708345
@@ -24,15 +9,6 @@ class IOC {
   /// init all app dependencies
   IOC.appScope() : parent = null {
     _initDependencies();
-  }
-
-  /// same as appScope, for testing purposes
-  IOC.appScopeTest({
-    void Function(Injector injector)? builder,
-  }) : parent = null {
-    if (builder != null) {
-      builder(injector);
-    }
   }
 
   /// assembler, injects services to the application
@@ -44,59 +20,20 @@ class IOC {
   final IOC? parent;
 
   void _initDependencies() {
-    /// Common
-    _registerSingleton<FlutterSecureStorage>(
-      DataModule.createFlutterSecureStorage,
+    _registerSingleton<Dio>(
+      (Injector injector) {
+        return DioFactory.create();
+      },
     );
-    _registerDependency<DateMapper>(DataModule.createDateMapper);
-    _registerDependency<StaticMapOptionsProvider>(
-      DataModule.createStaticMapOptionsProvider,
+    _registerSingleton<MessagesProvider>(
+      (Injector injector) => MessagesNetworkInterface(
+        apiClient: injector.get<ApiClient>(),
+      ),
     );
-
-    /// Api Clients
-    _registerSingleton<Dio>(NetworkModule.createDio);
-    _registerSingleton<ApiClient>(NetworkModule.createApiClient);
-
-    /// Storage
-    _registerSingleton<UserPreferences>(DataModule.createUserPreferences);
-
-    /// Data Providers
-    _registerSingleton<LocaleProvider>(DataModule.createLocaleProvider);
-
-    /// Data Mappers
-    _registerDependency<POIMapper>(DataModule.createPOIMapper);
-    _registerDependency<POIsProvider>(DataModule.createPOIsProvider);
-    _registerDependency<DisplayMetricsProvider>(
-        DataModule.createDisplayMetricsProvider);
-    _registerDependency<GoogleSearchMapper>(DataModule.createGooglePlaceMapper);
-    _registerDependency<PlaceDetailsMapper>(
-        DataModule.createPlaceDetailsMapper);
-
-    /// App UI
-    _registerSingleton<DefaultCacheManager>(
-      AppModule.createDefaultCacheManager,
-    );
-    _registerSingleton<MarkerUtils>(AppModule.createMarkerUtils);
-    _registerSingleton<Connectivity>(AppModule.createConnectivity);
-    _registerSingleton<UrlOpener>(AppModule.createUrlOpener);
-
-    /// Interactors
-    _registerSingleton<PositionInteractor>(
-      DomainModule.createPositionInteractor,
-    );
-    _registerSingleton<POIsInteractor>(
-      DomainModule.createPOIsInteractor,
-    );
-    _registerSingleton<GoogleSearchInteractor>(
-      DomainModule.createGooglePlaceInteractor,
-    );
-
-    /// Blocs
-    _registerDependency<SplashBloc>(BlocModule.createSplashBloc);
-    _registerDependency<PositionBloc>(BlocModule.createPositionBloc);
-    _registerDependency<POIsBloc>(BlocModule.createPOIsBloc);
-    _registerDependency<GoogleSearchBloc>(
-      BlocModule.createGooglePlacesBloc,
+    _registerSingleton<MessagesService>(
+      (Injector injector) => MessagesService(
+        messagesProvider: injector.get<MessagesProvider>(),
+      ),
     );
   }
 
