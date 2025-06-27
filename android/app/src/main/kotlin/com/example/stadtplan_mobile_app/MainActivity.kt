@@ -1,4 +1,4 @@
-package ch.stadtplan.zurich
+package ch.filippo.zurich
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,6 +1,7 @@
 import 'package:conversational_commerce/bloc/bloc.dart';
 import 'package:conversational_commerce/models/message_model.dart';
 import 'package:conversational_commerce/themes/constants/spacings.dart';
+import 'package:conversational_commerce/utils/keyboard_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -92,7 +93,7 @@ class ChatWidget extends StatelessWidget {
                       Expanded(
                         child: TextField(
                           controller: chatController,
-                          keyboardType: TextInputType.number,
+                          keyboardType: TextInputType.text,
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             focusedBorder: InputBorder.none,
@@ -110,6 +111,7 @@ class ChatWidget extends StatelessWidget {
                         child: ElevatedButton(
                           onPressed: () {
                             if (chatController.text.isNotEmpty) {
+                              KeyboardUtils().hideKeyBoard(context: context);
                               messageBloc.add(
                                 NewMessageEvent(
                                   message: chatController.text,
