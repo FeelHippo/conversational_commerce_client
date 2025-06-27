@@ -9,5 +9,5 @@ class Spacings {
   static const double xxLarge = 40;
   static const double xxxLarge = 48;
   static const double xxxxLarge = 64;
-  static const double huge = 92;
+  static const double huge = 192;
 }

@@ -15,7 +15,7 @@ class DioFactory {
 
   static Dio create() {
     final BaseOptions options = BaseOptions(
-      baseUrl: 'http://192.168.1.100',
+      baseUrl: 'http://192.168.1.100:8080',
       receiveDataWhenStatusError: true,
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),

@@ -1,4 +1,5 @@
 import 'package:apiClient/main.dart';
+import 'package:conversational_commerce/bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:injector/injector.dart';
@@ -25,6 +26,11 @@ class IOC {
         return DioFactory.create();
       },
     );
+    _registerSingleton<ApiClient>(
+      (Injector injector) => ApiClient(
+        injector.get<Dio>(),
+      ),
+    );
     _registerSingleton<MessagesProvider>(
       (Injector injector) => MessagesNetworkInterface(
         apiClient: injector.get<ApiClient>(),
@@ -33,6 +39,11 @@ class IOC {
     _registerSingleton<MessagesService>(
       (Injector injector) => MessagesService(
         messagesProvider: injector.get<MessagesProvider>(),
+      ),
+    );
+    _registerDependency(
+      (Injector injector) => MessageBloc(
+        messagesService: injector.get<MessagesService>(),
       ),
     );
   }

@@ -8,7 +8,7 @@ part 'api_client.g.dart';
 abstract class ApiClient {
   factory ApiClient(Dio dio) = _ApiClient;
   // Posts user's chat messages to the AI agent
-  @GET('/')
+  @POST('/')
   Future<String> postNewMessage({
     @Body() required ChatMessagesRequest request,
   });
