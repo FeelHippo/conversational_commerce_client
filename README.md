@@ -39,4 +39,5 @@ dart run build_runner build --delete-conflicting-outputs
 ```
 
 [SEE IT IN ACTION HERE](https://drive.google.com/file/d/1xvYmOOgvl0g4z7XWtbOL3n3ws5iqqBTC/view?usp=drive_link)
-![SCREENSHOT](https://drive.google.com/file/d/1qL8t_zuCYgn1d0kP-L4xgBPJfnzs_1k3/view?usp=drive_link)
+
+<img src="https://drive.google.com/file/d/1qL8t_zuCYgn1d0kP-L4xgBPJfnzs_1k3/view?usp=drive_link" width="128"/>
